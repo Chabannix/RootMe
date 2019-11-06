@@ -55,5 +55,10 @@ while 1:
         if line.find("PRIVMSG "+channel_name) >-1 :
             command = "PRIVMSG "+channel_name+" :Hi guys, i'm chabannix\r\n"
             send_command(s, command)
+
+        # PING received -> reply PONG
+        if line.split()[0] == "PING":
+            command = "PONG "+line.split()[1]+"\r\n"
+            send_command(s, command)
        
     buffer = ""
