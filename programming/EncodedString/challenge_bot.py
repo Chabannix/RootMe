@@ -2,7 +2,7 @@
 
 import socket
 import time
-import math
+import base64
 
 # send() and recv() from socket module works with bytes objets, not strings
 # here : all processes are done with strings, and at the end, send_command() 
@@ -13,7 +13,6 @@ def send_command(socket, command):
     print('\033[91m' + command +'\033[0m')
     socket.send(command.encode())
 
-          
 server_name     = "irc.root-me.org"
 port            = 6667
 channel_name    = "#root-me_challenge"
@@ -57,14 +56,13 @@ while 1:
 
                 encodedString = line.split()[index+1]
                 encodedString = encodedString[1:] # we remove the ':' before the first number
+                print("encodedString = "+encodedString)
                 
-                print("\nencodedString = "+encodedString)
-                decodedString = ""
+                decodedString = base64.b64decode(encodedString).decode()
+                print("decodedString = "+decodedString)
 
-                #TODO : decode string via Base64 code
-
-                #command = "PRIVMSG " + bot_name_rootme + " :!ep2 -rep " + decodedString + "\r\n"
-                #send_command(s, command)
+                command = "PRIVMSG " + bot_name_rootme + " :!ep2 -rep " + decodedString + "\r\n"
+                send_command(s, command)
 
         # PING received -> reply PONG
         if line.split()[0] == "PING":
