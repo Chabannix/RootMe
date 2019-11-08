@@ -33,6 +33,7 @@ time.sleep(3) # seems necessary for the server to be ready
 send_command(s, "PRIVMSG " + bot_name_rootme + " :!ep2\r\n")
 
 buffer = ""
+get_pwd = False
 while 1:
 
     buffer += s.recv(4096).decode()
@@ -41,32 +42,35 @@ while 1:
     lines = buffer.splitlines()
 
     for line in lines:
+        if get_pwd == False:
 
-        # check if this is a Candy msg :
-        if line.find("PRIVMSG "+bot_name) >-1 :
-            user_name = ""
-            for c in line.split()[0]:
-                if c == '!':
-                    break
-                if c != ':':
-                    user_name += c
-            
-            if user_name == bot_name_rootme:
-                index = line.split().index("chabannix")
+            # check if this is a Candy msg :
+            if line.find("PRIVMSG "+bot_name) >-1 :
+                user_name = ""
+                for c in line.split()[0]:
+                    if c == '!':
+                        break
+                    if c != ':':
+                        user_name += c
 
-                encodedString = line.split()[index+1]
-                encodedString = encodedString[1:] # we remove the ':' before the first number
-                print("encodedString = "+encodedString)
-                
-                decodedString = base64.b64decode(encodedString).decode()
-                print("decodedString = "+decodedString)
+                if user_name == bot_name_rootme:
+                    index = line.split().index("chabannix")
 
-                command = "PRIVMSG " + bot_name_rootme + " :!ep2 -rep " + decodedString + "\r\n"
-                send_command(s, command)
+                    encodedString = line.split()[index+1]
+                    encodedString = encodedString[1:] # we remove the ':' before the first number
+                    print("encodedString = "+encodedString)
+
+                    decodedString = base64.b64decode(encodedString).decode()
+                    print("decodedString = "+decodedString)
+
+                    command = "PRIVMSG " + bot_name_rootme + " :!ep2 -rep " + decodedString + "\r\n"
+                    send_command(s, command)
+
+                    get_pwd = True
 
         # PING received -> reply PONG
         if line.split()[0] == "PING":
             command = "PONG "+line.split()[1]+"\r\n"
             send_command(s, command)
-       
+
     buffer = ""
